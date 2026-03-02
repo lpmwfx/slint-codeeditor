@@ -1,0 +1,12 @@
+[package]
+name = "slint-code-editor"
+version = "0.1.0"
+edition = "2021"
+description = "Code editor with syntax highlighting built in Slint + Rust"
+
+[dependencies]
+slint = "1.15"
+rfd = "0.15"
+
+[build-dependencies]
+slint-build = "1.15"
