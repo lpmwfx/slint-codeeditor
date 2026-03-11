@@ -1,0 +1,29 @@
+# RULES: slint_codeeditor_widget
+
+## Active Rules
+
+### Always
+- global/topology.md
+- global/module-tree.md
+- global/file-limits.md
+- global/config-driven.md
+- global/persistent-state.md
+
+### Language: Rust
+- rust/README.md
+
+### UI (Slint - Windows)
+- uiux/mother-child.md
+- uiux/tokens.md
+- uiux/components.md
+- uiux/state-flow.md
+- uiux/file-structure.md
+- uiux/help-about.md
+- uiux/checklist.md
+- uiux/menus-windows.md
+- uiux/menus-slint.md
+- slint/README.md
+- slint/responsive-layout.md
+
+## Project Rules
+_No project-specific rules yet. AI adds here when patterns are observed._

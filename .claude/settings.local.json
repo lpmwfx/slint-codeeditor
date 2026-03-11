@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh api:*)",
+      "Bash(gh repo:*)",
+      "Bash(cd \"D:\\\\REPO\\\\SLINT\\\\code-editor\\\\slint_codeeditor_widget\" && cargo build 2>&1)",
+      "mcp__rules__search_rules",
+      "mcp__rules__get_rule",
+      "Bash(cd \"D:\\\\REPO\\\\SLINT\\\\code-editor\\\\slint_codeeditor_widget\" && cargo build --example demo 2>&1)"
+    ]
+  }
+}

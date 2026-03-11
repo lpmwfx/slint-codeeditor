@@ -1,0 +1,6 @@
+languages = ["rust", "js", "slint"]
+
+# Token definition files — literal hex/px values are EXPECTED here (that is their purpose)
+# The no-hardcoded-color / no-hardcoded-size rules apply to component files only
+[exclude]
+paths = ["ui/tokens/"]
