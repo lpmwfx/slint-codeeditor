@@ -2,37 +2,31 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Run demo (debug)",
+      "name": "Demo — debug",
       "type": "lldb",
       "request": "launch",
-      "cargo": {
-        "args": ["build", "--bin=slint-code-editor"],
-        "filter": { "name": "slint-code-editor", "kind": "bin" }
-      },
+      "program": "${workspaceFolder}/target/debug/slint-code-editor.exe",
       "args": [],
-      "cwd": "${workspaceFolder}"
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "cargo build (debug)"
     },
     {
-      "name": "Run demo (release)",
+      "name": "Demo — release",
       "type": "lldb",
       "request": "launch",
-      "cargo": {
-        "args": ["build", "--release", "--bin=slint-code-editor"],
-        "filter": { "name": "slint-code-editor", "kind": "bin" }
-      },
+      "program": "${workspaceFolder}/target/release/slint-code-editor.exe",
       "args": [],
-      "cwd": "${workspaceFolder}"
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "cargo build (release)"
     },
     {
-      "name": "Open file in editor (debug)",
+      "name": "Demo — åbn aktiv fil",
       "type": "lldb",
       "request": "launch",
-      "cargo": {
-        "args": ["build", "--bin=slint-code-editor"],
-        "filter": { "name": "slint-code-editor", "kind": "bin" }
-      },
+      "program": "${workspaceFolder}/target/debug/slint-code-editor.exe",
       "args": ["${file}"],
-      "cwd": "${workspaceFolder}"
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "cargo build (debug)"
     }
   ]
 }
