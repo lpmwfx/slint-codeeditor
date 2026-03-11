@@ -1,0 +1,21 @@
+import { EditorTheme } from "../tokens/theme.slint";
+
+// Single gutter row — stateless, no hardcoded size (fills slot from parent)
+export component LineNumber inherits Rectangle {
+    in property <int>    number;
+    in property <bool>   active;
+    in property <length> row-height: EditorTheme.line-height;
+
+    preferred-height: root.row-height;
+
+    Text {
+        text: number;
+        color: active ? EditorTheme.text-gutter-active : EditorTheme.text-gutter;
+        font-family: "Cascadia Code, JetBrains Mono, Consolas, monospace";
+        font-size: EditorTheme.font-size-gutter;
+        horizontal-alignment: right;
+        vertical-alignment: center;
+        width: 100%;
+        height: 100%;
+    }
+}

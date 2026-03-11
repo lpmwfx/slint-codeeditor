@@ -1,0 +1,47 @@
+// Design token global — all color values injected by Rust adapter at startup
+// No literal hex values in this file — Rust sets all colors via ui.global::<EditorTheme>().set_*()
+export global EditorTheme {
+    // Background — set by Rust adapter
+    in property <color> bg-editor;
+    in property <color> bg-gutter;
+    in property <color> bg-active-line;
+    in property <color> bg-titlebar;
+    in property <color> border-color;
+
+    // Text — set by Rust adapter
+    in property <color> text-gutter;
+    in property <color> text-gutter-active;
+    in property <color> text-title;
+    in property <color> text-info;
+
+    // Cursor — set by Rust adapter
+    in property <color> cursor-color;
+
+    // Syntax — set by Rust adapter
+    in property <color> syn-keyword;
+    in property <color> syn-string;
+    in property <color> syn-number;
+    in property <color> syn-comment;
+    in property <color> syn-function;
+    in property <color> syn-type;
+    in property <color> syn-property;
+    in property <color> syn-operator;
+    in property <color> syn-punctuation;
+    in property <color> syn-plain;
+    in property <color> syn-bool;
+    in property <color> syn-builtin;
+
+    // Button states — set by Rust adapter
+    in property <color> btn-bg;
+    in property <color> btn-bg-hover;
+    in property <color> btn-text;
+
+    // Layout tokens — fixed, no dynamic override needed
+    out property <length> line-height:       22px;
+    out property <length> gutter-width:      56px;
+    out property <length> code-padding-left: 12px;
+    out property <length> font-size-code:    13px;
+    out property <length> font-size-gutter:  12px;
+    out property <length> font-size-ui:      11px;
+    out property <length> font-size-info:    10px;
+}

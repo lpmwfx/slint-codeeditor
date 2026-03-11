@@ -1,0 +1,93 @@
+// AppWindow — MOTHER
+// Owns all state. Controls all layout dimensions.
+// Children receive props only (in property + callback).
+import { EditorTheme } from "tokens/theme.slint";
+export { EditorTheme }
+import { FlatToken, CodeLine } from "types.slint";
+import { EditorView } from "editor/editor-view.slint";
+import { Toolbar } from "toolbar/toolbar.slint";
+import { StatusBar } from "status-bar/status-bar.slint";
+
+export component AppWindow inherits Window {
+    title: "Code Editor — Slint";
+    width: 960px;
+    height: 640px;
+    background: EditorTheme.bg-editor;
+
+    // === All state owned here — Rust pushes via set_*() ===
+    in property <[CodeLine]>  lines;
+    in property <[FlatToken]> all-tokens;
+    in property <int>         cursor-line:  0;
+    in property <int>         cursor-col:   0;
+    in property <float>       char-width:   7.8;
+    in property <int>         total-lines:  0;
+    in property <string>      status-text:  "Ln 1, Col 1";
+    in property <string>      language:     "JavaScript";
+    in property <string>      file-name:    "demo.js";
+
+    // === Callbacks to Rust adapter ===
+    callback key-pressed(string, bool, bool, bool);
+    callback editor-clicked(float, float);
+    callback open-file();
+
+    VerticalLayout {
+        // Title bar — mother owns height
+        Rectangle {
+            height: 38px;
+            background: EditorTheme.bg-titlebar;
+
+            Text {
+                text: root.file-name + " — Code Editor";
+                color: EditorTheme.text-title;
+                font-size: EditorTheme.font-size-ui;
+                horizontal-alignment: center;
+                vertical-alignment: center;
+            }
+
+            Rectangle {
+                y: parent.height - 1px;
+                height: 1px;
+                background: EditorTheme.border-color;
+            }
+        }
+
+        // Toolbar child — mother sets height
+        Toolbar {
+            height: 32px;
+            language:  root.language;
+            file-name: root.file-name;
+            open-file => { root.open-file(); }
+        }
+
+        // Editor view — grows to fill all remaining space
+        EditorView {
+            vertical-stretch: 1;
+            lines:       root.lines;
+            all-tokens:  root.all-tokens;
+            cursor-line: root.cursor-line;
+            cursor-col:  root.cursor-col;
+            char-width:  root.char-width;
+            total-lines: root.total-lines;
+            editor-clicked(x, y) => { root.editor-clicked(x, y); }
+        }
+
+        // Status bar child — mother sets height
+        StatusBar {
+            height: 26px;
+            status-text: root.status-text;
+        }
+    }
+
+    // Global keyboard handler — captures all keys, forwards to Rust
+    FocusScope {
+        key-pressed(event) => {
+            root.key-pressed(
+                event.text,
+                event.modifiers.control,
+                event.modifiers.shift,
+                event.modifiers.alt
+            );
+            accept
+        }
+    }
+}

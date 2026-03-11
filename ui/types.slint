@@ -1,0 +1,16 @@
+// Shared struct types used across editor components
+
+// Individual syntax-highlighted token — absolutely positioned in the code area
+export struct FlatToken {
+    text: string,
+    token-color: color,
+    line-idx: int,
+    x-offset: float,  // character units — multiply by char-width to get px
+}
+
+// One line of code — used by the gutter
+export struct CodeLine {
+    full-text: string,
+    line-number: int,
+    is-active: bool,
+}

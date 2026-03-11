@@ -1,0 +1,60 @@
+import { EditorTheme } from "../tokens/theme.slint";
+
+// Toolbar: open button + language badge + encoding
+// Stateless — fills height slot provided by AppWindow
+export component Toolbar inherits Rectangle {
+    in property <string> language:  "JavaScript";
+    in property <string> file-name: "untitled";
+
+    callback open-file();
+
+    background: EditorTheme.bg-titlebar;
+    preferred-height: 32px;
+
+    HorizontalLayout {
+        padding-left: 10px;
+        padding-right: 10px;
+        spacing: 12px;
+        alignment: start;
+
+        open-ta := TouchArea {
+            width: 72px;
+            height: 22px;
+            clicked => { root.open-file(); }
+            Rectangle {
+                border-radius: 4px;
+                background: open-ta.has-hover ? EditorTheme.btn-bg-hover : EditorTheme.btn-bg;
+                border-width: 1px;
+                border-color: EditorTheme.border-color;
+                Text {
+                    text: "📂 Åbn";
+                    color: EditorTheme.btn-text;
+                    font-size: EditorTheme.font-size-ui;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                }
+            }
+        }
+
+        Text {
+            text: root.language;
+            color: EditorTheme.syn-keyword;
+            font-size: EditorTheme.font-size-info;
+            font-weight: 600;
+            vertical-alignment: center;
+        }
+
+        Text {
+            text: "UTF-8";
+            color: EditorTheme.text-info;
+            font-size: EditorTheme.font-size-info;
+            vertical-alignment: center;
+        }
+    }
+
+    Rectangle {
+        y: parent.height - 1px;
+        height: 1px;
+        background: EditorTheme.border-color;
+    }
+}

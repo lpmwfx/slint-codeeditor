@@ -1,0 +1,36 @@
+import { EditorTheme } from "../tokens/theme.slint";
+
+// Status bar — stateless, fills slot provided by AppWindow
+export component StatusBar inherits Rectangle {
+    in property <string> status-text: "Ln 1, Col 1";
+    in property <string> mode-text:   "NORMAL";
+
+    background: EditorTheme.bg-titlebar;
+    preferred-height: 26px;
+
+    Rectangle {
+        y: 0;
+        height: 1px;
+        background: EditorTheme.border-color;
+    }
+
+    HorizontalLayout {
+        padding-left: 14px;
+        padding-right: 14px;
+        alignment: space-between;
+
+        Text {
+            text: root.mode-text;
+            color: EditorTheme.text-info;
+            font-size: EditorTheme.font-size-info;
+            vertical-alignment: center;
+        }
+
+        Text {
+            text: root.status-text;
+            color: EditorTheme.text-gutter-active;
+            font-size: EditorTheme.font-size-info;
+            vertical-alignment: center;
+        }
+    }
+}

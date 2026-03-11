@@ -1,0 +1,101 @@
+import { EditorTheme } from "../tokens/theme.slint";
+import { FlatToken, CodeLine } from "../types.slint";
+import { LineNumber } from "line-number.slint";
+
+// Editor body: gutter + scrollable code area with tokens, active line, cursor
+// Stateless — mother (AppWindow) controls all dimensions and passes all state
+export component EditorView inherits Rectangle {
+    // State in (from mother)
+    in property <[CodeLine]>  lines;
+    in property <[FlatToken]> all-tokens;
+    in property <int>         cursor-line: 0;
+    in property <int>         cursor-col:  0;
+    in property <float>       char-width:  7.8;
+    in property <int>         total-lines: 0;
+
+    // Events out (to mother)
+    callback editor-clicked(float, float);
+
+    background: EditorTheme.bg-editor;
+
+    HorizontalLayout {
+        // === Gutter (line numbers) ===
+        Rectangle {
+            width: EditorTheme.gutter-width;
+            background: EditorTheme.bg-gutter;
+            clip: true;
+
+            // Scroll in sync with flickable
+            VerticalLayout {
+                y: -flickable.viewport-y;
+
+                for line[i] in root.lines : LineNumber {
+                    number:     line.line-number;
+                    active:     line.is-active;
+                    row-height: EditorTheme.line-height;
+                }
+            }
+
+            // Right border
+            Rectangle {
+                x: parent.width - 1px;
+                width: 1px;
+                background: EditorTheme.border-color;
+            }
+        }
+
+        // === Scrollable code area ===
+        flickable := Flickable {
+            viewport-height: root.total-lines * EditorTheme.line-height;
+
+            // Click → bubble up to mother
+            TouchArea {
+                clicked => {
+                    root.editor-clicked(
+                        self.mouse-x / 1px,
+                        (self.mouse-y - flickable.viewport-y) / 1px
+                    );
+                }
+            }
+
+            // Active line highlight (behind tokens)
+            Rectangle {
+                x: 0;
+                y: root.cursor-line * EditorTheme.line-height;
+                width: 100%;
+                height: EditorTheme.line-height;
+                background: EditorTheme.bg-active-line;
+            }
+
+            // Flat token model — each token absolutely positioned
+            for token[i] in root.all-tokens : Text {
+                x: EditorTheme.code-padding-left + (token.x-offset * root.char-width * 1px);
+                y: token.line-idx * EditorTheme.line-height;
+                text: token.text;
+                color: token.token-color;
+                font-family: "Cascadia Code, JetBrains Mono, Consolas, monospace";
+                font-size: EditorTheme.font-size-code;
+                height: EditorTheme.line-height;
+                vertical-alignment: center;
+            }
+
+            // Cursor with blink animation
+            cursor-rect := Rectangle {
+                x: EditorTheme.code-padding-left + (root.cursor-col * root.char-width * 1px);
+                y: root.cursor-line * EditorTheme.line-height + 3px;
+                width: 2px;
+                height: 16px;
+                background: EditorTheme.cursor-color;
+
+                property <bool> blink-on: true;
+                opacity: blink-on ? 1.0 : 0.0;
+                animate opacity { duration: 500ms; }
+
+                Timer {
+                    interval: 530ms;
+                    triggered => { cursor-rect.blink-on = !cursor-rect.blink-on; }
+                }
+            }
+        }
+    }
+}
