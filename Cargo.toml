@@ -1,8 +1,16 @@
 [package]
-name = "slint-code-editor"
+name = "slint_codeeditor_widget"
 version = "0.1.0"
 edition = "2021"
 description = "Code editor with syntax highlighting built in Slint + Rust"
+
+[lib]
+name = "slint_codeeditor_widget"
+crate-type = ["rlib"]
+
+[[example]]
+name = "demo"
+path = "examples/demo/main.rs"
 
 [dependencies]
 slint = "1.15"

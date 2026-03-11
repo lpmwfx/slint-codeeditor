@@ -1,12 +1,8 @@
-// AppWindow — MOTHER
-// Owns all state. Controls all layout dimensions.
-// Children receive props only (in property + callback).
-import { EditorTheme } from "tokens/theme.slint";
+// AppWindow — MOTHER (demo only)
+// Owns all state. Embeds CodeEditorWidget as a stateless child.
+// Keyboard handling lives here — it is a window-level concern.
+import { CodeEditorWidget, EditorTheme, FlatToken, CodeLine } from "widget.slint";
 export { EditorTheme }
-import { FlatToken, CodeLine } from "types.slint";
-import { EditorView } from "editor/editor-view.slint";
-import { Toolbar } from "toolbar/toolbar.slint";
-import { StatusBar } from "status-bar/status-bar.slint";
 
 export component AppWindow inherits Window {
     title: "Code Editor — Slint";
@@ -30,55 +26,47 @@ export component AppWindow inherits Window {
     callback editor-clicked(float, float);
     callback open-file();
 
-    VerticalLayout {
-        // Title bar — mother owns height
+    // Title bar — mother owns height
+    Rectangle {
+        height: 38px;
+        background: EditorTheme.bg-titlebar;
+
+        Text {
+            text: root.file-name + " — Code Editor";
+            color: EditorTheme.text-title;
+            font-size: EditorTheme.font-size-ui;
+            horizontal-alignment: center;
+            vertical-alignment: center;
+        }
+
         Rectangle {
-            height: 38px;
-            background: EditorTheme.bg-titlebar;
-
-            Text {
-                text: root.file-name + " — Code Editor";
-                color: EditorTheme.text-title;
-                font-size: EditorTheme.font-size-ui;
-                horizontal-alignment: center;
-                vertical-alignment: center;
-            }
-
-            Rectangle {
-                y: parent.height - 1px;
-                height: 1px;
-                background: EditorTheme.border-color;
-            }
-        }
-
-        // Toolbar child — mother sets height
-        Toolbar {
-            height: 32px;
-            language:  root.language;
-            file-name: root.file-name;
-            open-file => { root.open-file(); }
-        }
-
-        // Editor view — grows to fill all remaining space
-        EditorView {
-            vertical-stretch: 1;
-            lines:       root.lines;
-            all-tokens:  root.all-tokens;
-            cursor-line: root.cursor-line;
-            cursor-col:  root.cursor-col;
-            char-width:  root.char-width;
-            total-lines: root.total-lines;
-            editor-clicked(x, y) => { root.editor-clicked(x, y); }
-        }
-
-        // Status bar child — mother sets height
-        StatusBar {
-            height: 26px;
-            status-text: root.status-text;
+            y: parent.height - 1px;
+            height: 1px;
+            background: EditorTheme.border-color;
         }
     }
 
-    // Global keyboard handler — captures all keys, forwards to Rust
+    // Widget child — fills remaining space
+    CodeEditorWidget {
+        y: 38px;
+        width: 100%;
+        height: root.height - 38px;
+
+        lines:       root.lines;
+        all-tokens:  root.all-tokens;
+        cursor-line: root.cursor-line;
+        cursor-col:  root.cursor-col;
+        char-width:  root.char-width;
+        total-lines: root.total-lines;
+        status-text: root.status-text;
+        language:    root.language;
+        file-name:   root.file-name;
+
+        editor-clicked(x, y) => { root.editor-clicked(x, y); }
+        open-file => { root.open-file(); }
+    }
+
+    // Global keyboard handler — window-level concern, stays in mother
     FocusScope {
         key-pressed(event) => {
             root.key-pressed(

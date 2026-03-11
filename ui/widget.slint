@@ -1,0 +1,54 @@
+// CodeEditorWidget — CHILD
+// Stateless. Receives all state from mother via in property.
+// Composes Toolbar + EditorView + StatusBar into one embeddable Rectangle.
+import { EditorTheme } from "tokens/theme.slint";
+export { EditorTheme }
+import { FlatToken, CodeLine } from "types.slint";
+export { FlatToken, CodeLine }
+import { EditorView } from "editor/editor-view.slint";
+import { Toolbar } from "toolbar/toolbar.slint";
+import { StatusBar } from "status-bar/status-bar.slint";
+
+export component CodeEditorWidget inherits Rectangle {
+    // State in — mother owns all of these
+    in property <[CodeLine]>  lines;
+    in property <[FlatToken]> all-tokens;
+    in property <int>         cursor-line:  0;
+    in property <int>         cursor-col:   0;
+    in property <float>       char-width:   7.8;
+    in property <int>         total-lines:  0;
+    in property <string>      status-text:  "Ln 1, Col 1";
+    in property <string>      language:     "JavaScript";
+    in property <string>      file-name:    "demo.js";
+
+    // Events out — bubble up to mother
+    callback editor-clicked(float, float);
+    callback open-file();
+
+    background: EditorTheme.bg-editor;
+
+    VerticalLayout {
+        Toolbar {
+            height: 32px;
+            language:  root.language;
+            file-name: root.file-name;
+            open-file => { root.open-file(); }
+        }
+
+        EditorView {
+            vertical-stretch: 1;
+            lines:       root.lines;
+            all-tokens:  root.all-tokens;
+            cursor-line: root.cursor-line;
+            cursor-col:  root.cursor-col;
+            char-width:  root.char-width;
+            total-lines: root.total-lines;
+            editor-clicked(x, y) => { root.editor-clicked(x, y); }
+        }
+
+        StatusBar {
+            height: 26px;
+            status-text: root.status-text;
+        }
+    }
+}

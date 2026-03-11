@@ -4227,15 +4227,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "slint-code-editor"
-version = "0.1.0"
-dependencies = [
- "rfd",
- "slint",
- "slint-build",
-]
-
-[[package]]
 name = "slint-macros"
 version = "1.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4245,6 +4236,15 @@ dependencies = [
  "proc-macro2",
  "quote",
  "spin_on",
+]
+
+[[package]]
+name = "slint_codeeditor_widget"
+version = "0.1.0"
+dependencies = [
+ "rfd",
+ "slint",
+ "slint-build",
 ]
 
 [[package]]

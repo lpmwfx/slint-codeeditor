@@ -1,50 +1,96 @@
-# Slint Code Editor — Syntax Highlighting Prototype
+# slint_codeeditor_widget
 
-En fungerende code editor med syntax highlighting bygget i **Slint + Rust**, baseret på præcis de samme primitiver som HTML/JS-versionen.
+Et genanvendeligt code editor-widget bygget i **Slint + Rust** med syntax highlighting, cursor, gutter og status bar.
 
-## Arkitektur-princip
+## Brug fra git
 
-Samme tilgang som HTML/JS — oversat til Slint-ækvivalenter:
-
-| HTML/JS primitiv | Slint-ækvivalent |
-|---|---|
-| `<textarea>` (skjult) | `FocusScope` + `TextInput` (off-screen) |
-| `<div>` scroll-container | `Flickable` |
-| `for`-loop over linjer | `for line in lines` |
-| `<span>` med farve per token | `for token in all-tokens : Text { color: token.color }` |
-| Absolut-positioneret cursor | `Rectangle` med `animate opacity` |
-| JS tokenizer | Rust `tokenize_line()` |
-
-## Nøgleindsigt: Flat Token Model
-
-Slint understøtter ikke nested `for`-loops (en `for` inde i en `for`). Løsningen er at **flatte** alle tokens fra alle linjer til én enkelt model. Hver token bærer sin linje-index og x-offset, så den kan absolut-positioneres i `Flickable`:
-
-```
-Linje 0: "const x = 42;"
-  → FlatToken { text: "const", line_idx: 0, x_offset: 0.0,   color: keyword }
-  → FlatToken { text: "x",     line_idx: 0, x_offset: 6.0,   color: plain }
-  → FlatToken { text: "=",     line_idx: 0, x_offset: 8.0,   color: operator }
-  → FlatToken { text: "42",    line_idx: 0, x_offset: 10.0,  color: number }
-  → FlatToken { text: ";",     line_idx: 0, x_offset: 12.0,  color: punctuation }
+```toml
+[dependencies]
+slint_codeeditor_widget = { git = "https://github.com/dit-repo/slint-code-editor" }
 ```
 
-## Kør projektet
+```rust
+fn main() -> Result<(), slint::PlatformError> {
+    slint_codeeditor_widget::run(None)                        // demo-fil
+    // slint_codeeditor_widget::run(Some("path/to/file.rs"))  // specifik fil
+}
+```
+
+## Kør demo
 
 ```bash
-# Kræver Rust toolchain
-cargo run
+cargo run --example demo
+cargo run --example demo -- path/to/file.js
 ```
 
-## Filer
+## Arkitektur
+
+### Mother-child
+
+`AppWindow` er **mother** — ejer al state, sætter alle dimensioner, modtager alle events.
+`CodeEditorWidget` er **child** — stateless, modtager kun `in property`, sender callbacks op.
 
 ```
-├── Cargo.toml           # Dependencies: slint 1.12
-├── build.rs             # Kompilerer .slint filen
-├── ui/
-│   └── editor.slint     # UI-definition med tokens, cursor, gutter
-├── src/
-│   └── main.rs          # Tokenizer, editor-state, Slint-integration
-└── README.md
+AppWindow (Window — mother)
+└── CodeEditorWidget (Rectangle — child, stateless)
+    ├── Toolbar
+    ├── EditorView
+    │   ├── gutter (LineNumber × N)
+    │   └── Flickable (tokens + cursor + active-line)
+    └── StatusBar
+```
+
+### Theming
+
+`EditorTheme` er en Slint global med udelukkende `in property <color>` — ingen hardkodede farveværdier.
+Rust-adapteren sætter alle tokens ved opstart via `ui.global::<EditorTheme>().set_*()`.
+
+```
+tokens/theme.slint   ← EditorTheme global (kun property-declarations)
+adapter/theme.rs     ← Rust sætter alle farver
+```
+
+### Flat token model
+
+Slint understøtter ikke nested `for`-loops. Alle tokens fra alle linjer flades til én model.
+Hver token bærer `line_idx` og `x_offset` og positioneres absolut i `Flickable`:
+
+```
+"const x = 42;"
+→ FlatToken { text: "const", line_idx: 0, x_offset: 0.0,  color: keyword }
+→ FlatToken { text: "x",     line_idx: 0, x_offset: 6.0,  color: plain }
+→ FlatToken { text: "=",     line_idx: 0, x_offset: 8.0,  color: operator }
+→ FlatToken { text: "42",    line_idx: 0, x_offset: 10.0, color: number }
+```
+
+### Lag
+
+```
+core/          EditorState, tokenizer — ren domænelogik, ingen UI
+gateway/       Fil-I/O, filtype-detection
+adapter/       Kobler Slint-callbacks til core (keyboard, mouse, file_ops, state_push, theme)
+```
+
+## Filstruktur
+
+```
+ui/
+  widget.slint          ← CodeEditorWidget (child, stateless)
+  app-window.slint      ← AppWindow (demo-mother, embedder widget)
+  tokens/theme.slint    ← EditorTheme design-token global
+  types.slint           ← FlatToken, CodeLine structs
+  editor/               ← EditorView + LineNumber
+  toolbar/              ← Toolbar
+  status-bar/           ← StatusBar
+
+src/
+  lib.rs                ← pub fn run() + slint::include_modules!()
+  core/                 ← EditorState, tokenizer
+  gateway/              ← fil-læsning
+  adapter/              ← UI-wiring
+
+examples/
+  demo/main.rs          ← demo-runner
 ```
 
 ## Features
@@ -52,23 +98,9 @@ cargo run
 - JavaScript syntax highlighting (keywords, strings, numbers, comments, functions, operators)
 - Piletaster, Home/End, Enter med auto-indent
 - Backspace/Delete, Tab (2 spaces)
-- Auto-lukning af brackets: `()`, `[]`, `{}`, `""`, `''`, ` `` `
+- Auto-lukning: `()` `[]` `{}` `""` `''` ` `` `
 - Klik-til-position
 - Animeret cursor med blink
 - Scroll via Flickable
 - Linjenumre med aktiv-linje highlight
-- Status bar med cursor position
-
-## BAppBuilder-relevans
-
-Dette demonstrerer at Slint KAN bygge en code editor med syntax highlighting — præcis som HTML/JS kan. Princippet er identisk:
-
-1. **Skjult input** fanger tastatur-events
-2. **Rust backend** tokenizer teksten og producerer farvede spans
-3. **Slint for-loop** renderer tokens som absolutt-positionerede `Text`-elementer
-4. **Cursor** er en animeret `Rectangle`
-
-I BAppBuilder-kontekst ville denne editor:
-- Leve i **Builder** som CORE-editoren (til SQL og JavaScript)
-- Bruge **syntect** eller **tree-sitter** i stedet for den simple tokenizer
-- Binde til **state-databasen** for undo/redo via variables
+- Status bar med cursor-position
