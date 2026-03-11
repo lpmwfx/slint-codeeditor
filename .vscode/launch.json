@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run demo (debug)",
+      "type": "lldb",
+      "request": "launch",
+      "cargo": {
+        "args": ["build", "--bin=slint-code-editor"],
+        "filter": { "name": "slint-code-editor", "kind": "bin" }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Run demo (release)",
+      "type": "lldb",
+      "request": "launch",
+      "cargo": {
+        "args": ["build", "--release", "--bin=slint-code-editor"],
+        "filter": { "name": "slint-code-editor", "kind": "bin" }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "Open file in editor (debug)",
+      "type": "lldb",
+      "request": "launch",
+      "cargo": {
+        "args": ["build", "--bin=slint-code-editor"],
+        "filter": { "name": "slint-code-editor", "kind": "bin" }
+      },
+      "args": ["${file}"],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
