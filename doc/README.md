@@ -72,3 +72,12 @@ I BAppBuilder-kontekst ville denne editor:
 - Leve i **Builder** som CORE-editoren (til SQL og JavaScript)
 - Bruge **syntect** eller **tree-sitter** i stedet for den simple tokenizer
 - Binde til **state-databasen** for undo/redo via variables
+
+
+---
+
+<!-- LARS:START -->
+<a href="https://lpmathiasen.com">
+  <img src="https://carousel.lpmathiasen.com/carousel.svg?slot=6" alt="Lars P. Mathiasen"/>
+</a>
+<!-- LARS:END -->
